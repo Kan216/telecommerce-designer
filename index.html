@@ -330,33 +330,57 @@
   exportBtn.addEventListener('click', async () => {
     exportBtn.disabled = true;
     exportBtn.textContent = 'Rendering…';
-    const removed = [];
-    try{
+    
+    // Create an off-screen container directly on body (outside .stage-inner scale transform)
+    const offscreenContainer = document.createElement('div');
+    offscreenContainer.style.position = 'fixed';
+    offscreenContainer.style.left = '-9999px';
+    offscreenContainer.style.top = '0';
+    offscreenContainer.style.width = '1080px';
+    offscreenContainer.style.height = '1080px';
+    offscreenContainer.style.overflow = 'hidden';
+    offscreenContainer.style.zIndex = '-9999';
+
+    // Deep clone canvasNode so we export at true 1080x1080 scale without parent CSS transform interference
+    const clone = canvasNode.cloneNode(true);
+    clone.style.transform = 'none';
+
+    // Remove inactive template panels from clone so html2canvas doesn't process them
+    clone.querySelectorAll('[data-tpl-panel]').forEach(panel => {
+      if (panel.getAttribute('data-tpl-panel') !== currentTpl) {
+        panel.remove();
+      }
+    });
+
+    offscreenContainer.appendChild(clone);
+    document.body.appendChild(offscreenContainer);
+
+    try {
       await document.fonts.ready;
-      // Physically detach every template except the active one so the export
-      // can't pick up leftover elements that are only CSS-hidden.
-      panels.forEach(p => {
-        if(p.getAttribute('data-tpl-panel') !== currentTpl){
-          removed.push({ el: p, next: p.nextSibling, parent: p.parentNode });
-          p.parentNode.removeChild(p);
-        }
-      });
-      const canvas = await html2canvas(canvasNode, {
+      
+      const canvas = await html2canvas(clone, {
         backgroundColor: '#EDEAE0',
         width: 1080,
         height: 1080,
         scale: 1,
         useCORS: true,
-        logging: false
+        logging: false,
+        windowWidth: 1080,
+        windowHeight: 1080,
+        x: 0,
+        y: 0
       });
+
       const link = document.createElement('a');
       link.download = 'tele-commerce-ad.png';
       link.href = canvas.toDataURL('image/png');
       link.click();
-    } catch(err){
+    } catch(err) {
       alert('Export failed: ' + err.message);
     } finally {
-      removed.forEach(({el, next, parent}) => parent.insertBefore(el, next));
+      if (document.body.contains(offscreenContainer)) {
+        document.body.removeChild(offscreenContainer);
+      }
       exportBtn.disabled = false;
       exportBtn.textContent = 'Export PNG (1080×1080)';
     }
