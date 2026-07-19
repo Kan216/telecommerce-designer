@@ -6,14 +6,13 @@
 <title>Tele-Commerce — Ad Image Generator</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&family=Noto+Sans+Myanmar:wght@400;500;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&family=Noto+Sans+Myanmar:wght@400;500;700&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <style>
   :root{
-    --paper:#EDEAE0; --ink:#1F2A24; --ink-soft:#5B6459;
-    --blue:#2C5F7C; --blue-deep:#1E4356; --gold:#C98A2E; --sage:#4C7A5E;
-    --rule:#D2CBB4; --white:#FBFAF6;
-    --ui-bg:#F7F7F5; --ui-panel:#FFFFFF; --ui-border:#E3E3DF; --ui-text:#2A2A28; --ui-muted:#87867F;
+    --tele-blue:#0088FF; --tele-cyan:#00C6FF; --tele-navy:#0A1128; --tele-dark:#080D1A;
+    --tele-ice:#F0F6FF; --white:#FFFFFF; --gold:#FFB800; --ink:#0F172A; --ink-soft:#475569;
+    --ui-bg:#0A0F1D; --ui-panel:#131A2C; --ui-border:#1E293B; --ui-text:#F8FAFC; --ui-muted:#94A3B8;
   }
   *{box-sizing:border-box;}
   body{
@@ -27,46 +26,51 @@
     background:var(--ui-panel); border-right:1px solid var(--ui-border);
     padding:32px 28px; min-height:100vh;
   }
+  .panel-header{ display:flex; align-items:center; gap:12px; margin-bottom:20px; }
+  .panel-logo{ width:36px; height:36px; object-fit:contain; }
   .panel h2{
-    font-family:'Space Grotesk',sans-serif; font-size:19px; margin:0 0 4px;
+    font-family:'Space Grotesk',sans-serif; font-size:20px; margin:0; color:#FFFFFF;
   }
   .panel .tagline{font-size:13px; color:var(--ui-muted); margin-bottom:28px;}
   label{
-    display:block; font-size:12px; font-weight:600; letter-spacing:0.03em;
-    text-transform:uppercase; color:var(--ui-muted); margin-bottom:8px; margin-top:24px;
+    display:block; font-size:12px; font-weight:600; letter-spacing:0.04em;
+    text-transform:uppercase; color:var(--ui-muted); margin-bottom:8px; margin-top:22px;
   }
   label:first-of-type{margin-top:0;}
   textarea, input[type=text]{
     width:100%; font-family:'Inter','Noto Sans Myanmar',sans-serif;
     font-size:15px; padding:12px 14px; border:1px solid var(--ui-border);
-    border-radius:6px; resize:vertical; background:#FBFBFA; color:var(--ui-text);
+    border-radius:8px; resize:vertical; background:#0A0F1D; color:var(--ui-text);
+    transition:border-color .15s ease, box-shadow .15s ease;
   }
-  textarea{min-height:78px; line-height:1.5;}
-  textarea:focus, input:focus{outline:2px solid var(--blue); outline-offset:1px; border-color:var(--blue);}
+  textarea{min-height:82px; line-height:1.5;}
+  textarea:focus, input:focus{outline:none; border-color:var(--tele-blue); box-shadow:0 0 0 3px rgba(0,136,255,0.25);}
 
   .tpl-grid{
     display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:10px;
   }
   .tpl-choice{
-    border:2px solid var(--ui-border); border-radius:6px; padding:10px 8px;
-    cursor:pointer; text-align:center; background:#FBFBFA;
+    border:2px solid var(--ui-border); border-radius:8px; padding:10px 8px;
+    cursor:pointer; text-align:center; background:#0A0F1D;
     font-size:12px; font-weight:600; color:var(--ui-muted);
-    transition:border-color .12s ease, color .12s ease;
+    transition:all .15s ease;
   }
   .tpl-choice .swatch{
-    width:100%; height:36px; border-radius:4px; margin-bottom:8px;
+    width:100%; height:38px; border-radius:6px; margin-bottom:8px;
   }
-  .tpl-choice.active{ border-color:var(--blue-deep); color:var(--ink); }
-  .tpl-choice:focus-visible{outline:2px solid var(--blue); outline-offset:2px;}
+  .tpl-choice.active{ border-color:var(--tele-cyan); color:#FFFFFF; background:#182238; box-shadow:0 0 12px rgba(0,198,255,0.15); }
+  .tpl-choice:focus-visible{outline:2px solid var(--tele-blue); outline-offset:2px;}
 
   .export-btn{
-    margin-top:32px; width:100%; padding:15px; border:none; border-radius:6px;
-    background:var(--blue-deep); color:var(--white); font-family:'Space Grotesk',sans-serif;
-    font-weight:600; font-size:15px; cursor:pointer;
+    margin-top:32px; width:100%; padding:16px; border:none; border-radius:8px;
+    background:linear-gradient(135deg, var(--tele-blue), var(--tele-cyan));
+    color:#FFFFFF; font-family:'Space Grotesk',sans-serif;
+    font-weight:700; font-size:16px; cursor:pointer;
+    box-shadow:0 6px 20px rgba(0,136,255,0.35); transition:transform .1s ease, box-shadow .15s ease;
   }
-  .export-btn:hover{background:var(--blue);}
-  .export-btn:disabled{opacity:0.6; cursor:default;}
-  .hint{font-size:12px; color:var(--ui-muted); margin-top:10px; line-height:1.5;}
+  .export-btn:hover{ transform:translateY(-1px); box-shadow:0 8px 24px rgba(0,136,255,0.45); }
+  .export-btn:disabled{opacity:0.6; cursor:default; transform:none;}
+  .hint{font-size:12px; color:var(--ui-muted); margin-top:12px; line-height:1.5;}
 
   /* ===== PREVIEW STAGE ===== */
   .stage-wrap{
@@ -75,7 +79,8 @@
   }
   .stage-scale{
     width:460px; height:460px; overflow:hidden; position:relative;
-    box-shadow:0 12px 40px -14px rgba(30,67,86,0.28);
+    box-shadow:0 20px 60px -15px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.08);
+    border-radius:12px;
   }
   .stage-inner{
     width:1080px; height:1080px;
@@ -84,91 +89,85 @@
 
   /* ===== TEMPLATE BASE (rendered at 1080x1080) ===== */
   .canvas{
-    width:1080px; height:1080px; background:var(--paper); color:var(--ink);
+    width:1080px; height:1080px; position:relative; overflow:hidden;
     font-family:'Inter','Noto Sans Myanmar',sans-serif;
-    position:relative; overflow:hidden;
   }
   .wordmark{
-    position:absolute; top:88px; left:92px;
-    font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:22px;
-    display:flex; align-items:center; gap:10px;
+    position:absolute; top:80px; left:92px;
+    font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:26px;
+    display:flex; align-items:center; gap:14px; z-index:10;
   }
-  .wordmark .dot{width:10px; height:10px; border-radius:50%; display:inline-block;}
+  .wordmark .logo-img{ width:48px; height:48px; object-fit:contain; filter:drop-shadow(0 4px 10px rgba(0,136,255,0.35)); }
+
   .eyebrow{
-    font-family:'JetBrains Mono',monospace; font-size:20px; letter-spacing:0.10em;
-    text-transform:uppercase; display:flex; align-items:center; gap:12px;
+    font-family:'JetBrains Mono',monospace; font-size:20px; letter-spacing:0.12em;
+    text-transform:uppercase; display:inline-flex; align-items:center; gap:10px;
+    padding:6px 16px; border-radius:20px; font-weight:700;
   }
-  .eyebrow::before{content:""; width:34px; height:2px; display:inline-block;}
   .headline{
     font-family:'Space Grotesk','Noto Sans Myanmar',sans-serif; font-weight:700;
     font-size:64px; line-height:1.3; white-space:pre-line;
   }
   .cta-pill{
-    font-family:'Space Grotesk','Noto Sans Myanmar',sans-serif; font-weight:600; font-size:26px;
-    color:var(--white); padding:20px 38px; border-radius:3px; display:inline-block;
-    white-space:pre-line;
-  }
-  .perf{
-    position:absolute; left:0; right:0; bottom:0; height:22px;
-    background:radial-gradient(circle at 11px 0, transparent 11px, var(--paper) 11.5px) repeat-x;
-    background-size:22px 22px;
+    font-family:'Space Grotesk','Noto Sans Myanmar',sans-serif; font-weight:700; font-size:26px;
+    padding:20px 42px; border-radius:10px; display:inline-flex; align-items:center; gap:12px;
+    white-space:pre-line; box-shadow:0 10px 30px rgba(0,0,0,0.18);
   }
 
-  /* ---- Template 1: Problem (gold, left-aligned, top-weighted) ---- */
-  .tpl-1 .wordmark .dot, .tpl-1 .eyebrow, .tpl-1 .eyebrow::before{ color:var(--gold); background:var(--gold);}
-  .tpl-1 .eyebrow{position:absolute; top:212px; left:92px;}
-  .tpl-1 .headline{position:absolute; top:262px; left:92px; max-width:840px;}
-  .tpl-1 .cta-pill{position:absolute; left:92px; bottom:130px; background:var(--blue-deep);}
+  /* ---- Template 1: Problem (Clean Light Electric) ---- */
+  .tpl-1{ background:var(--tele-ice); color:var(--ink); height:100%; width:100%; position:relative;}
+  .tpl-1 .wordmark{ color:var(--tele-navy); }
+  .tpl-1 .eyebrow{ position:absolute; top:200px; left:92px; background:rgba(0,136,255,0.12); color:var(--tele-blue); }
+  .tpl-1 .headline{ position:absolute; top:260px; left:92px; max-width:860px; color:var(--ink); }
+  .tpl-1 .cta-pill{ position:absolute; left:92px; bottom:120px; background:var(--tele-blue); color:var(--white); }
+  .tpl-1 .accent-bg{ position:absolute; right:-100px; bottom:-100px; width:500px; height:500px; border-radius:50%; background:radial-gradient(circle, rgba(0,198,255,0.15) 0%, transparent 70%); pointer-events:none; }
 
-  /* ---- Template 2: Offer (blue, left-aligned, CTA large/prominent) ---- */
-  .tpl-2 .wordmark .dot{background:var(--blue-deep);}
-  .tpl-2 .eyebrow{position:absolute; top:212px; left:92px; color:var(--blue-deep);}
-  .tpl-2 .eyebrow::before{background:var(--blue-deep);}
-  .tpl-2 .headline{position:absolute; top:262px; left:92px; max-width:840px;}
-  .tpl-2 .cta-pill{position:absolute; left:92px; bottom:110px; background:var(--blue-deep); font-size:30px; padding:24px 44px;}
+  /* ---- Template 2: Offer (Midnight Navy & Cyan Glow) ---- */
+  .tpl-2{ background:linear-gradient(145deg, #0A1128 0%, #111C3A 100%); color:#FFFFFF; height:100%; width:100%; position:relative; }
+  .tpl-2 .wordmark{ color:#FFFFFF; }
+  .tpl-2 .eyebrow{ position:absolute; top:200px; left:92px; background:rgba(0,198,255,0.15); color:var(--tele-cyan); border:1px solid rgba(0,198,255,0.3); }
+  .tpl-2 .headline{ position:absolute; top:260px; left:92px; max-width:860px; color:#FFFFFF; }
+  .tpl-2 .cta-pill{ position:absolute; left:92px; bottom:110px; background:linear-gradient(135deg, var(--tele-cyan), var(--tele-blue)); color:#0A1128; font-size:30px; padding:24px 48px; box-shadow:0 12px 36px rgba(0,198,255,0.35); }
+  .tpl-2 .watermark-logo{ position:absolute; right:60px; bottom:60px; width:380px; opacity:0.07; filter:brightness(2); pointer-events:none; }
 
-  /* ---- Template 3: Trust (sage, centered, soft) ---- */
-  .tpl-3 .wordmark{left:50%; top:88px; transform:translateX(-50%);}
-  .tpl-3 .wordmark .dot{background:var(--sage);}
-  .tpl-3 .eyebrow{position:absolute; top:420px; left:50%; transform:translateX(-50%); color:var(--sage); flex-direction:row-reverse;}
-  .tpl-3 .eyebrow::before{background:var(--sage);}
-  .tpl-3 .headline{position:absolute; top:470px; left:50%; transform:translateX(-50%); max-width:820px; text-align:center;}
-  .tpl-3 .cta-pill{position:absolute; left:50%; bottom:150px; transform:translateX(-50%); background:var(--sage);}
+  /* ---- Template 3: Trust (Ice Blue Verified Card) ---- */
+  .tpl-3{ background:#FFFFFF; color:var(--ink); height:100%; width:100%; position:relative; }
+  .tpl-3 .wordmark{ left:50%; top:80px; transform:translateX(-50%); color:var(--tele-navy); }
+  .tpl-3 .eyebrow{ position:absolute; top:400px; left:50%; transform:translateX(-50%); background:#E0F2FE; color:#0284C7; border:1px solid #BAE6FD; }
+  .tpl-3 .headline{ position:absolute; top:460px; left:50%; transform:translateX(-50%); max-width:840px; text-align:center; color:var(--ink); }
+  .tpl-3 .cta-pill{ position:absolute; left:50%; bottom:140px; transform:translateX(-50%); background:var(--tele-navy); color:#FFFFFF; border:2px solid var(--tele-blue); }
 
-  /* ---- Template 4: Urgency (gold, bold underline emphasis) ---- */
-  .tpl-4 .wordmark .dot{background:var(--gold);}
-  .tpl-4 .headline{position:absolute; top:300px; left:92px; max-width:880px; font-size:72px;
-    background:linear-gradient(transparent 66%, rgba(201,138,46,0.32) 0%);
-    background-repeat:no-repeat; background-size:100% 100%; display:inline;}
-  .tpl-4-headwrap{position:absolute; top:300px; left:92px; max-width:880px;}
-  .tpl-4 .cta-pill{position:absolute; left:92px; bottom:120px; background:var(--gold); color:var(--ink);}
+  /* ---- Template 4: Urgency (Electric Gradient Banner) ---- */
+  .tpl-4{ background:linear-gradient(135deg, #0052D4 0%, #007BFF 50%, #00C6FF 100%); color:#FFFFFF; height:100%; width:100%; position:relative; }
+  .tpl-4 .wordmark{ color:#FFFFFF; }
+  .tpl-4 .wordmark .logo-img{ filter:brightness(0) invert(1) drop-shadow(0 4px 12px rgba(0,0,0,0.2)); }
+  .tpl-4 .tpl-4-headwrap{ position:absolute; top:280px; left:92px; max-width:880px; }
+  .tpl-4 .headline{ font-size:72px; color:#FFFFFF; text-shadow:0 4px 16px rgba(0,0,0,0.2); }
+  .tpl-4 .cta-pill{ position:absolute; left:92px; bottom:120px; background:#FFFFFF; color:#0052D4; font-size:28px; box-shadow:0 12px 32px rgba(0,0,0,0.25); }
 
-  /* ---- Template 5: Identity (blue, headline top / CTA bottom-right) ---- */
-  .tpl-5 .wordmark .dot{background:var(--blue-deep);}
-  .tpl-5 .headline{position:absolute; top:250px; left:92px; max-width:820px;}
-  .tpl-5 .cta-pill{position:absolute; right:92px; bottom:110px; background:var(--blue-deep);}
-  .tpl-5::after{
-    content:""; position:absolute; top:88px; right:92px; bottom:88px; width:1px;
-    background:repeating-linear-gradient(to bottom, var(--rule) 0 8px, transparent 8px 16px);
-    opacity:0.6;
+  /* ---- Template 5: Identity (Sleek Dark Glassmorphism) ---- */
+  .tpl-5{ background:var(--tele-dark); color:#FFFFFF; height:100%; width:100%; position:relative; display:flex; align-items:center; justify-content:center;}
+  .tpl-5 .wordmark{ position:absolute; top:80px; left:92px; color:#FFFFFF; }
+  .tpl-5 .glass-card{
+    width:900px; height:800px; margin-top:60px;
+    background:rgba(255,255,255,0.04); backdrop-filter:blur(30px); -webkit-backdrop-filter:blur(30px);
+    border:1px solid rgba(255,255,255,0.12); border-radius:24px; padding:80px 64px; position:relative;
+    box-shadow:0 30px 80px rgba(0,0,0,0.5); display:flex; flex-direction:column; justify-content:space-between;
   }
+  .tpl-5 .headline{ font-size:64px; color:#FFFFFF; }
+  .tpl-5 .cta-pill{ align-self:flex-start; background:var(--tele-cyan); color:var(--tele-navy); }
+  .tpl-5 .glass-logo{ position:absolute; right:60px; top:60px; width:120px; opacity:0.15; }
 
-  /* ---- Template 6: Ticket (centered receipt-style card, no line items) ---- */
-  .tpl-6{ display:flex; align-items:center; justify-content:center; }
-  .tpl-6 .wordmark{position:absolute;}
+  /* ---- Template 6: Ticket (Telegram Receipt Card) ---- */
+  .tpl-6{ background:#0D1527; height:100%; width:100%; position:relative; display:flex; align-items:center; justify-content:center; }
   .tpl-6 .ticket-card{
-    width:760px; background:var(--white); padding:70px 64px 86px; position:relative;
-    box-shadow:0 22px 50px -20px rgba(30,67,86,0.30); text-align:center;
+    width:780px; background:#FFFFFF; border-radius:20px; padding:70px 64px 86px; position:relative;
+    box-shadow:0 24px 60px rgba(0,0,0,0.4); text-align:center;
   }
-  .tpl-6 .ticket-card::after{
-    content:""; position:absolute; left:0; right:0; bottom:-11px; height:22px;
-    background:radial-gradient(circle at 11px 0, transparent 11px, var(--paper) 11.5px) repeat-x;
-    background-size:22px 22px;
-  }
-  .tpl-6 .eyebrow{color:var(--sage); justify-content:center; margin-bottom:26px;}
-  .tpl-6 .eyebrow::before{background:var(--sage);}
-  .tpl-6 .headline{font-size:56px; text-align:center;}
-  .tpl-6 .cta-pill{background:var(--blue-deep); margin-top:40px;}
+  .tpl-6 .wordmark{ position:static; justify-content:center; margin-bottom:30px; color:var(--tele-navy); }
+  .tpl-6 .eyebrow{ background:rgba(0,136,255,0.1); color:var(--tele-blue); margin-bottom:24px; }
+  .tpl-6 .headline{ font-size:56px; text-align:center; color:var(--ink); }
+  .tpl-6 .cta-pill{ background:var(--tele-blue); color:#FFFFFF; margin-top:40px; }
 
   .hidden{display:none !important;}
 
@@ -184,7 +183,10 @@
 <body>
 
 <div class="panel">
-  <h2>Ad Image Generator</h2>
+  <div class="panel-header">
+    <img src="logo.png" alt="Tele-Commerce Logo" class="panel-logo">
+    <h2>Ad Generator</h2>
+  </div>
   <div class="tagline">Tele-Commerce brand templates — headline + CTA in, PNG out</div>
 
   <label for="headlineInput">Headline</label>
@@ -192,19 +194,19 @@
 ရှုပ်နေပြီလား?</textarea>
 
   <label for="sizeSlider">Headline Size <span id="sizeValueLabel" style="text-transform:none; font-weight:400; color:var(--ui-text);">100%</span></label>
-  <input type="range" id="sizeSlider" min="50" max="160" value="100" style="width:100%; accent-color:#1E4356;">
+  <input type="range" id="sizeSlider" min="50" max="160" value="100" style="width:100%; accent-color:#0088FF;">
 
   <label for="ctaInput">Call to Action</label>
   <input type="text" id="ctaInput" value="Tele-Commerce ကိုဖွင့်ပါ →">
 
   <label>Template</label>
   <div class="tpl-grid" id="tplGrid">
-    <div class="tpl-choice active" data-tpl="1" tabindex="0"><div class="swatch" style="background:linear-gradient(135deg,#EDEAE0,#C98A2E)"></div>Problem</div>
-    <div class="tpl-choice" data-tpl="2" tabindex="0"><div class="swatch" style="background:linear-gradient(135deg,#EDEAE0,#1E4356)"></div>Offer</div>
-    <div class="tpl-choice" data-tpl="3" tabindex="0"><div class="swatch" style="background:linear-gradient(135deg,#EDEAE0,#4C7A5E)"></div>Trust</div>
-    <div class="tpl-choice" data-tpl="4" tabindex="0"><div class="swatch" style="background:linear-gradient(135deg,#C98A2E,#EDEAE0)"></div>Urgency</div>
-    <div class="tpl-choice" data-tpl="5" tabindex="0"><div class="swatch" style="background:linear-gradient(135deg,#1E4356,#EDEAE0)"></div>Identity</div>
-    <div class="tpl-choice" data-tpl="6" tabindex="0"><div class="swatch" style="background:linear-gradient(135deg,#FBFAF6,#4C7A5E)"></div>Ticket</div>
+    <div class="tpl-choice active" data-tpl="1" tabindex="0"><div class="swatch" style="background:linear-gradient(135deg,#F0F6FF,#0088FF)"></div>Problem</div>
+    <div class="tpl-choice" data-tpl="2" tabindex="0"><div class="swatch" style="background:linear-gradient(135deg,#0A1128,#00C6FF)"></div>Offer</div>
+    <div class="tpl-choice" data-tpl="3" tabindex="0"><div class="swatch" style="background:linear-gradient(135deg,#FFFFFF,#0A1128)"></div>Trust</div>
+    <div class="tpl-choice" data-tpl="4" tabindex="0"><div class="swatch" style="background:linear-gradient(135deg,#0052D4,#00C6FF)"></div>Urgency</div>
+    <div class="tpl-choice" data-tpl="5" tabindex="0"><div class="swatch" style="background:linear-gradient(135deg,#080D1A,#00C6FF)"></div>Identity</div>
+    <div class="tpl-choice" data-tpl="6" tabindex="0"><div class="swatch" style="background:linear-gradient(135deg,#FFFFFF,#0088FF)"></div>Ticket</div>
   </div>
 
   <button class="export-btn" id="exportBtn">Export PNG (1080×1080)</button>
@@ -218,53 +220,57 @@
 
         <!-- Template 1: Problem -->
         <div class="tpl-1" data-tpl-panel="1">
-          <div class="wordmark"><span class="dot"></span>Tele-Commerce</div>
+          <div class="wordmark"><img src="logo.png" alt="Logo" class="logo-img"><span>Tele-Commerce</span></div>
           <div class="eyebrow">PROBLEM</div>
           <div class="headline js-headline"></div>
           <div class="cta-pill js-cta"></div>
+          <div class="accent-bg"></div>
         </div>
 
         <!-- Template 2: Offer -->
         <div class="tpl-2 hidden" data-tpl-panel="2">
-          <div class="wordmark"><span class="dot"></span>Tele-Commerce</div>
-          <div class="eyebrow">OFFER</div>
+          <div class="wordmark"><img src="logo.png" alt="Logo" class="logo-img"><span>Tele-Commerce</span></div>
+          <div class="eyebrow">SPECIAL OFFER</div>
           <div class="headline js-headline"></div>
           <div class="cta-pill js-cta"></div>
+          <img src="logo.png" alt="Watermark" class="watermark-logo">
         </div>
 
         <!-- Template 3: Trust -->
         <div class="tpl-3 hidden" data-tpl-panel="3">
-          <div class="wordmark"><span class="dot"></span>Tele-Commerce</div>
-          <div class="eyebrow">TRUST</div>
+          <div class="wordmark"><img src="logo.png" alt="Logo" class="logo-img"><span>Tele-Commerce</span></div>
+          <div class="eyebrow">✓ VERIFIED SELLER</div>
           <div class="headline js-headline"></div>
           <div class="cta-pill js-cta"></div>
         </div>
 
         <!-- Template 4: Urgency -->
         <div class="tpl-4 hidden" data-tpl-panel="4">
-          <div class="wordmark"><span class="dot"></span>Tele-Commerce</div>
+          <div class="wordmark"><img src="logo.png" alt="Logo" class="logo-img"><span>Tele-Commerce</span></div>
           <div class="tpl-4-headwrap"><div class="headline js-headline"></div></div>
           <div class="cta-pill js-cta"></div>
         </div>
 
         <!-- Template 5: Identity -->
         <div class="tpl-5 hidden" data-tpl-panel="5">
-          <div class="wordmark"><span class="dot"></span>Tele-Commerce</div>
-          <div class="headline js-headline"></div>
-          <div class="cta-pill js-cta"></div>
-        </div>
-
-        <!-- Template 6: Ticket -->
-        <div class="tpl-6 hidden" data-tpl-panel="6">
-          <div class="wordmark"><span class="dot"></span>Tele-Commerce</div>
-          <div class="ticket-card">
-            <div class="eyebrow">TELE-COMMERCE</div>
+          <div class="wordmark"><img src="logo.png" alt="Logo" class="logo-img"><span>Tele-Commerce</span></div>
+          <div class="glass-card">
+            <img src="logo.png" alt="Logo" class="glass-logo">
             <div class="headline js-headline"></div>
             <div class="cta-pill js-cta"></div>
           </div>
         </div>
 
-        <div class="perf"></div>
+        <!-- Template 6: Ticket -->
+        <div class="tpl-6 hidden" data-tpl-panel="6">
+          <div class="ticket-card">
+            <div class="wordmark"><img src="logo.png" alt="Logo" class="logo-img"><span>Tele-Commerce</span></div>
+            <div class="eyebrow">TELE-COMMERCE ORDER</div>
+            <div class="headline js-headline"></div>
+            <div class="cta-pill js-cta"></div>
+          </div>
+        </div>
+
       </div>
     </div>
   </div>
@@ -281,6 +287,14 @@
   const sizeValueLabel = document.getElementById('sizeValueLabel');
 
   const headlineBasePx = {1:64, 2:64, 3:64, 4:72, 5:64, 6:56};
+  const tplBgColor = {
+    '1': '#F0F6FF',
+    '2': '#0A1128',
+    '3': '#FFFFFF',
+    '4': '#0052D4',
+    '5': '#080D1A',
+    '6': '#0D1527'
+  };
   let currentTpl = '1';
 
   function syncText(){
@@ -358,8 +372,9 @@
     try {
       await document.fonts.ready;
       
+      const bgColor = tplBgColor[currentTpl] || '#0A1128';
       const canvas = await html2canvas(clone, {
-        backgroundColor: '#EDEAE0',
+        backgroundColor: bgColor,
         width: 1080,
         height: 1080,
         scale: 1,
@@ -372,7 +387,7 @@
       });
 
       const link = document.createElement('a');
-      link.download = 'tele-commerce-ad.png';
+      link.download = `tele-commerce-ad-tpl${currentTpl}.png`;
       link.href = canvas.toDataURL('image/png');
       link.click();
     } catch(err) {
