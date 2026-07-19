@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="my">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tele-Commerce — Ad Image Generator</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&family=Noto+Sans+Myanmar:wght@400;500;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<style>
+  :root{
+    --paper:#EDEAE0; --ink:#1F2A24; --ink-soft:#5B6459;
+    --blue:#2C5F7C; --blue-deep:#1E4356; --gold:#C98A2E; --sage:#4C7A5E;
+    --rule:#D2CBB4; --white:#FBFAF6;
+    --ui-bg:#F7F7F5; --ui-panel:#FFFFFF; --ui-border:#E3E3DF; --ui-text:#2A2A28; --ui-muted:#87867F;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; background:var(--ui-bg); color:var(--ui-text);
+    font-family:'Inter',sans-serif;
+    display:flex; flex-wrap:wrap; min-height:100vh;
+  }
+  /* ===== CONTROL PANEL ===== */
+  .panel{
+    width:380px; flex-shrink:0;
+    background:var(--ui-panel); border-right:1px solid var(--ui-border);
+    padding:32px 28px; min-height:100vh;
+  }
+  .panel h2{
+    font-family:'Space Grotesk',sans-serif; font-size:19px; margin:0 0 4px;
+  }
+  .panel .tagline{font-size:13px; color:var(--ui-muted); margin-bottom:28px;}
+  label{
+    display:block; font-size:12px; font-weight:600; letter-spacing:0.03em;
+    text-transform:uppercase; color:var(--ui-muted); margin-bottom:8px; margin-top:24px;
+  }
+  label:first-of-type{margin-top:0;}
+  textarea, input[type=text]{
+    width:100%; font-family:'Inter','Noto Sans Myanmar',sans-serif;
+    font-size:15px; padding:12px 14px; border:1px solid var(--ui-border);
+    border-radius:6px; resize:vertical; background:#FBFBFA; color:var(--ui-text);
+  }
+  textarea{min-height:78px; line-height:1.5;}
+  textarea:focus, input:focus{outline:2px solid var(--blue); outline-offset:1px; border-color:var(--blue);}
+
+  .tpl-grid{
+    display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:10px;
+  }
+  .tpl-choice{
+    border:2px solid var(--ui-border); border-radius:6px; padding:10px 8px;
+    cursor:pointer; text-align:center; background:#FBFBFA;
+    font-size:12px; font-weight:600; color:var(--ui-muted);
+    transition:border-color .12s ease, color .12s ease;
+  }
+  .tpl-choice .swatch{
+    width:100%; height:36px; border-radius:4px; margin-bottom:8px;
+  }
+  .tpl-choice.active{ border-color:var(--blue-deep); color:var(--ink); }
+  .tpl-choice:focus-visible{outline:2px solid var(--blue); outline-offset:2px;}
+
+  .export-btn{
+    margin-top:32px; width:100%; padding:15px; border:none; border-radius:6px;
+    background:var(--blue-deep); color:var(--white); font-family:'Space Grotesk',sans-serif;
+    font-weight:600; font-size:15px; cursor:pointer;
+  }
+  .export-btn:hover{background:var(--blue);}
+  .export-btn:disabled{opacity:0.6; cursor:default;}
+  .hint{font-size:12px; color:var(--ui-muted); margin-top:10px; line-height:1.5;}
+
+  /* ===== PREVIEW STAGE ===== */
+  .stage-wrap{
+    flex:1; display:flex; align-items:center; justify-content:center;
+    padding:40px; min-width:320px;
+  }
+  .stage-scale{
+    width:460px; height:460px; overflow:hidden; position:relative;
+    box-shadow:0 12px 40px -14px rgba(30,67,86,0.28);
+  }
+  .stage-inner{
+    width:1080px; height:1080px;
+    transform:scale(0.4259); transform-origin: top left;
+  }
+
+  /* ===== TEMPLATE BASE (rendered at 1080x1080) ===== */
+  .canvas{
+    width:1080px; height:1080px; background:var(--paper); color:var(--ink);
+    font-family:'Inter','Noto Sans Myanmar',sans-serif;
+    position:relative; overflow:hidden;
+  }
+  .wordmark{
+    position:absolute; top:88px; left:92px;
+    font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:22px;
+    display:flex; align-items:center; gap:10px;
+  }
+  .wordmark .dot{width:10px; height:10px; border-radius:50%; display:inline-block;}
+  .eyebrow{
+    font-family:'JetBrains Mono',monospace; font-size:20px; letter-spacing:0.10em;
+    text-transform:uppercase; display:flex; align-items:center; gap:12px;
+  }
+  .eyebrow::before{content:""; width:34px; height:2px; display:inline-block;}
+  .headline{
+    font-family:'Space Grotesk','Noto Sans Myanmar',sans-serif; font-weight:700;
+    font-size:64px; line-height:1.3; white-space:pre-line;
+  }
+  .cta-pill{
+    font-family:'Space Grotesk','Noto Sans Myanmar',sans-serif; font-weight:600; font-size:26px;
+    color:var(--white); padding:20px 38px; border-radius:3px; display:inline-block;
+    white-space:pre-line;
+  }
+  .perf{
+    position:absolute; left:0; right:0; bottom:0; height:22px;
+    background:radial-gradient(circle at 11px 0, transparent 11px, var(--paper) 11.5px) repeat-x;
+    background-size:22px 22px;
+  }
+
+  /* ---- Template 1: Problem (gold, left-aligned, top-weighted) ---- */
+  .tpl-1 .wordmark .dot, .tpl-1 .eyebrow, .tpl-1 .eyebrow::before{ color:var(--gold); background:var(--gold);}
+  .tpl-1 .eyebrow{position:absolute; top:212px; left:92px;}
+  .tpl-1 .headline{position:absolute; top:262px; left:92px; max-width:840px;}
+  .tpl-1 .cta-pill{position:absolute; left:92px; bottom:130px; background:var(--blue-deep);}
+
+  /* ---- Template 2: Offer (blue, left-aligned, CTA large/prominent) ---- */
+  .tpl-2 .wordmark .dot{background:var(--blue-deep);}
+  .tpl-2 .eyebrow{position:absolute; top:212px; left:92px; color:var(--blue-deep);}
+  .tpl-2 .eyebrow::before{background:var(--blue-deep);}
+  .tpl-2 .headline{position:absolute; top:262px; left:92px; max-width:840px;}
+  .tpl-2 .cta-pill{position:absolute; left:92px; bottom:110px; background:var(--blue-deep); font-size:30px; padding:24px 44px;}
+
+  /* ---- Template 3: Trust (sage, centered, soft) ---- */
+  .tpl-3 .wordmark{left:50%; top:88px; transform:translateX(-50%);}
+  .tpl-3 .wordmark .dot{background:var(--sage);}
+  .tpl-3 .eyebrow{position:absolute; top:420px; left:50%; transform:translateX(-50%); color:var(--sage); flex-direction:row-reverse;}
+  .tpl-3 .eyebrow::before{background:var(--sage);}
+  .tpl-3 .headline{position:absolute; top:470px; left:50%; transform:translateX(-50%); max-width:820px; text-align:center;}
+  .tpl-3 .cta-pill{position:absolute; left:50%; bottom:150px; transform:translateX(-50%); background:var(--sage);}
+
+  /* ---- Template 4: Urgency (gold, bold underline emphasis) ---- */
+  .tpl-4 .wordmark .dot{background:var(--gold);}
+  .tpl-4 .headline{position:absolute; top:300px; left:92px; max-width:880px; font-size:72px;
+    background:linear-gradient(transparent 66%, rgba(201,138,46,0.32) 0%);
+    background-repeat:no-repeat; background-size:100% 100%; display:inline;}
+  .tpl-4-headwrap{position:absolute; top:300px; left:92px; max-width:880px;}
+  .tpl-4 .cta-pill{position:absolute; left:92px; bottom:120px; background:var(--gold); color:var(--ink);}
+
+  /* ---- Template 5: Identity (blue, headline top / CTA bottom-right) ---- */
+  .tpl-5 .wordmark .dot{background:var(--blue-deep);}
+  .tpl-5 .headline{position:absolute; top:250px; left:92px; max-width:820px;}
+  .tpl-5 .cta-pill{position:absolute; right:92px; bottom:110px; background:var(--blue-deep);}
+  .tpl-5::after{
+    content:""; position:absolute; top:88px; right:92px; bottom:88px; width:1px;
+    background:repeating-linear-gradient(to bottom, var(--rule) 0 8px, transparent 8px 16px);
+    opacity:0.6;
+  }
+
+  /* ---- Template 6: Ticket (centered receipt-style card, no line items) ---- */
+  .tpl-6{ display:flex; align-items:center; justify-content:center; }
+  .tpl-6 .wordmark{position:absolute;}
+  .tpl-6 .ticket-card{
+    width:760px; background:var(--white); padding:70px 64px 86px; position:relative;
+    box-shadow:0 22px 50px -20px rgba(30,67,86,0.30); text-align:center;
+  }
+  .tpl-6 .ticket-card::after{
+    content:""; position:absolute; left:0; right:0; bottom:-11px; height:22px;
+    background:radial-gradient(circle at 11px 0, transparent 11px, var(--paper) 11.5px) repeat-x;
+    background-size:22px 22px;
+  }
+  .tpl-6 .eyebrow{color:var(--sage); justify-content:center; margin-bottom:26px;}
+  .tpl-6 .eyebrow::before{background:var(--sage);}
+  .tpl-6 .headline{font-size:56px; text-align:center;}
+  .tpl-6 .cta-pill{background:var(--blue-deep); margin-top:40px;}
+
+  .hidden{display:none !important;}
+
+  @media (max-width:860px){
+    body{flex-direction:column;}
+    .panel{width:100%; min-height:auto; border-right:none; border-bottom:1px solid var(--ui-border);}
+    .stage-wrap{padding:24px;}
+    .stage-scale{width:340px; height:340px;}
+    .stage-inner{transform:scale(0.3148);}
+  }
+</style>
+</head>
+<body>
+
+<div class="panel">
+  <h2>Ad Image Generator</h2>
+  <div class="tagline">Tele-Commerce brand templates — headline + CTA in, PNG out</div>
+
+  <label for="headlineInput">Headline</label>
+  <textarea id="headlineInput" placeholder="Order စာရင်း&#10;ရှုပ်နေပြီလား?">Order စာရင်း
+ရှုပ်နေပြီလား?</textarea>
+
+  <label for="sizeSlider">Headline Size <span id="sizeValueLabel" style="text-transform:none; font-weight:400; color:var(--ui-text);">100%</span></label>
+  <input type="range" id="sizeSlider" min="50" max="160" value="100" style="width:100%; accent-color:#1E4356;">
+
+  <label for="ctaInput">Call to Action</label>
+  <input type="text" id="ctaInput" value="Tele-Commerce ကိုဖွင့်ပါ →">
+
+  <label>Template</label>
+  <div class="tpl-grid" id="tplGrid">
+    <div class="tpl-choice active" data-tpl="1" tabindex="0"><div class="swatch" style="background:linear-gradient(135deg,#EDEAE0,#C98A2E)"></div>Problem</div>
+    <div class="tpl-choice" data-tpl="2" tabindex="0"><div class="swatch" style="background:linear-gradient(135deg,#EDEAE0,#1E4356)"></div>Offer</div>
+    <div class="tpl-choice" data-tpl="3" tabindex="0"><div class="swatch" style="background:linear-gradient(135deg,#EDEAE0,#4C7A5E)"></div>Trust</div>
+    <div class="tpl-choice" data-tpl="4" tabindex="0"><div class="swatch" style="background:linear-gradient(135deg,#C98A2E,#EDEAE0)"></div>Urgency</div>
+    <div class="tpl-choice" data-tpl="5" tabindex="0"><div class="swatch" style="background:linear-gradient(135deg,#1E4356,#EDEAE0)"></div>Identity</div>
+    <div class="tpl-choice" data-tpl="6" tabindex="0"><div class="swatch" style="background:linear-gradient(135deg,#FBFAF6,#4C7A5E)"></div>Ticket</div>
+  </div>
+
+  <button class="export-btn" id="exportBtn">Export PNG (1080×1080)</button>
+  <div class="hint">Renders at full 1080×1080 for Facebook/Telegram — the preview on the right is scaled down to fit your screen.</div>
+</div>
+
+<div class="stage-wrap">
+  <div class="stage-scale">
+    <div class="stage-inner">
+      <div class="canvas" id="canvasNode">
+
+        <!-- Template 1: Problem -->
+        <div class="tpl-1" data-tpl-panel="1">
+          <div class="wordmark"><span class="dot"></span>Tele-Commerce</div>
+          <div class="eyebrow">PROBLEM</div>
+          <div class="headline js-headline"></div>
+          <div class="cta-pill js-cta"></div>
+        </div>
+
+        <!-- Template 2: Offer -->
+        <div class="tpl-2 hidden" data-tpl-panel="2">
+          <div class="wordmark"><span class="dot"></span>Tele-Commerce</div>
+          <div class="eyebrow">OFFER</div>
+          <div class="headline js-headline"></div>
+          <div class="cta-pill js-cta"></div>
+        </div>
+
+        <!-- Template 3: Trust -->
+        <div class="tpl-3 hidden" data-tpl-panel="3">
+          <div class="wordmark"><span class="dot"></span>Tele-Commerce</div>
+          <div class="eyebrow">TRUST</div>
+          <div class="headline js-headline"></div>
+          <div class="cta-pill js-cta"></div>
+        </div>
+
+        <!-- Template 4: Urgency -->
+        <div class="tpl-4 hidden" data-tpl-panel="4">
+          <div class="wordmark"><span class="dot"></span>Tele-Commerce</div>
+          <div class="tpl-4-headwrap"><div class="headline js-headline"></div></div>
+          <div class="cta-pill js-cta"></div>
+        </div>
+
+        <!-- Template 5: Identity -->
+        <div class="tpl-5 hidden" data-tpl-panel="5">
+          <div class="wordmark"><span class="dot"></span>Tele-Commerce</div>
+          <div class="headline js-headline"></div>
+          <div class="cta-pill js-cta"></div>
+        </div>
+
+        <!-- Template 6: Ticket -->
+        <div class="tpl-6 hidden" data-tpl-panel="6">
+          <div class="wordmark"><span class="dot"></span>Tele-Commerce</div>
+          <div class="ticket-card">
+            <div class="eyebrow">TELE-COMMERCE</div>
+            <div class="headline js-headline"></div>
+            <div class="cta-pill js-cta"></div>
+          </div>
+        </div>
+
+        <div class="perf"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  const headlineInput = document.getElementById('headlineInput');
+  const ctaInput = document.getElementById('ctaInput');
+  const tplGrid = document.getElementById('tplGrid');
+  const exportBtn = document.getElementById('exportBtn');
+  const canvasNode = document.getElementById('canvasNode');
+  const panels = canvasNode.querySelectorAll('[data-tpl-panel]');
+  const sizeSlider = document.getElementById('sizeSlider');
+  const sizeValueLabel = document.getElementById('sizeValueLabel');
+
+  const headlineBasePx = {1:64, 2:64, 3:64, 4:72, 5:64, 6:56};
+  let currentTpl = '1';
+
+  function syncText(){
+    const h = headlineInput.value;
+    const c = ctaInput.value;
+    canvasNode.querySelectorAll('.js-headline').forEach(el => el.textContent = h);
+    canvasNode.querySelectorAll('.js-cta').forEach(el => el.textContent = c);
+  }
+  function applyFontSize(){
+    const pct = parseInt(sizeSlider.value, 10);
+    sizeValueLabel.textContent = pct + '%';
+    const base = headlineBasePx[currentTpl] || 64;
+    const px = Math.round(base * pct / 100);
+    canvasNode.querySelectorAll('.js-headline').forEach(el => el.style.fontSize = px + 'px');
+  }
+  function setTemplate(n){
+    currentTpl = String(n);
+    panels.forEach(p => {
+      p.classList.toggle('hidden', p.getAttribute('data-tpl-panel') !== currentTpl);
+    });
+    tplGrid.querySelectorAll('.tpl-choice').forEach(c => {
+      c.classList.toggle('active', c.getAttribute('data-tpl') === currentTpl);
+    });
+    applyFontSize();
+  }
+
+  headlineInput.addEventListener('input', syncText);
+  ctaInput.addEventListener('input', syncText);
+  sizeSlider.addEventListener('input', applyFontSize);
+  tplGrid.addEventListener('click', e => {
+    const choice = e.target.closest('.tpl-choice');
+    if(!choice) return;
+    setTemplate(choice.getAttribute('data-tpl'));
+  });
+  tplGrid.addEventListener('keydown', e => {
+    const choice = e.target.closest('.tpl-choice');
+    if(!choice) return;
+    if(e.key === 'Enter' || e.key === ' '){
+      e.preventDefault();
+      setTemplate(choice.getAttribute('data-tpl'));
+    }
+  });
+
+  syncText();
+  applyFontSize();
+
+  exportBtn.addEventListener('click', async () => {
+    exportBtn.disabled = true;
+    exportBtn.textContent = 'Rendering…';
+    try{
+      await document.fonts.ready;
+      const canvas = await html2canvas(canvasNode, {
+        backgroundColor: '#EDEAE0',
+        width: 1080,
+        height: 1080,
+        scale: 1,
+        useCORS: true
+      });
+      const link = document.createElement('a');
+      link.download = 'tele-commerce-ad.png';
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+    } catch(err){
+      alert('Export failed: ' + err.message);
+    } finally {
+      exportBtn.disabled = false;
+      exportBtn.textContent = 'Export PNG (1080×1080)';
+    }
+  });
+</script>
+
+</body>
+</html>
