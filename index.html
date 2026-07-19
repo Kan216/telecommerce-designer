@@ -330,14 +330,24 @@
   exportBtn.addEventListener('click', async () => {
     exportBtn.disabled = true;
     exportBtn.textContent = 'Rendering…';
+    const removed = [];
     try{
       await document.fonts.ready;
+      // Physically detach every template except the active one so the export
+      // can't pick up leftover elements that are only CSS-hidden.
+      panels.forEach(p => {
+        if(p.getAttribute('data-tpl-panel') !== currentTpl){
+          removed.push({ el: p, next: p.nextSibling, parent: p.parentNode });
+          p.parentNode.removeChild(p);
+        }
+      });
       const canvas = await html2canvas(canvasNode, {
         backgroundColor: '#EDEAE0',
         width: 1080,
         height: 1080,
         scale: 1,
-        useCORS: true
+        useCORS: true,
+        logging: false
       });
       const link = document.createElement('a');
       link.download = 'tele-commerce-ad.png';
@@ -346,6 +356,7 @@
     } catch(err){
       alert('Export failed: ' + err.message);
     } finally {
+      removed.forEach(({el, next, parent}) => parent.insertBefore(el, next));
       exportBtn.disabled = false;
       exportBtn.textContent = 'Export PNG (1080×1080)';
     }
