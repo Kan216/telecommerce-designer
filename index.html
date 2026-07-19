@@ -110,8 +110,8 @@
   }
   .cta-pill{
     font-family:'Space Grotesk','Noto Sans Myanmar',sans-serif; font-weight:700; font-size:26px;
-    padding:20px 42px; border-radius:10px; display:inline-flex; align-items:center; gap:12px;
-    white-space:pre-line; box-shadow:0 10px 30px rgba(0,0,0,0.18);
+    padding:20px 42px; border-radius:14px; display:inline-flex; align-items:center; gap:12px;
+    white-space:pre-line; border:4px solid rgba(255,255,255,0.9);
   }
 
   /* ---- Template 1: Problem (Clean Light Electric) ---- */
@@ -119,7 +119,7 @@
   .tpl-1 .wordmark{ color:var(--tele-navy); }
   .tpl-1 .eyebrow{ position:absolute; top:200px; left:92px; background:rgba(0,136,255,0.12); color:var(--tele-blue); }
   .tpl-1 .headline{ position:absolute; top:260px; left:92px; max-width:860px; color:var(--ink); }
-  .tpl-1 .cta-pill{ position:absolute; left:92px; bottom:120px; background:var(--tele-blue); color:var(--white); }
+  .tpl-1 .cta-pill{ position:absolute; left:92px; bottom:120px; background:var(--tele-blue); color:var(--white); border:4px solid #FFFFFF; }
   .tpl-1 .accent-bg{ position:absolute; right:-100px; bottom:-100px; width:500px; height:500px; border-radius:50%; background:radial-gradient(circle, rgba(0,198,255,0.15) 0%, transparent 70%); pointer-events:none; }
 
   /* ---- Template 2: Offer (Midnight Navy & Cyan Glow) ---- */
@@ -127,7 +127,7 @@
   .tpl-2 .wordmark{ color:#FFFFFF; }
   .tpl-2 .eyebrow{ position:absolute; top:200px; left:92px; background:rgba(0,198,255,0.15); color:var(--tele-cyan); border:1px solid rgba(0,198,255,0.3); }
   .tpl-2 .headline{ position:absolute; top:260px; left:92px; max-width:860px; color:#FFFFFF; }
-  .tpl-2 .cta-pill{ position:absolute; left:92px; bottom:110px; background:linear-gradient(135deg, var(--tele-cyan), var(--tele-blue)); color:#0A1128; font-size:30px; padding:24px 48px; box-shadow:0 12px 36px rgba(0,198,255,0.35); }
+  .tpl-2 .cta-pill{ position:absolute; left:92px; bottom:110px; background:linear-gradient(135deg, var(--tele-cyan), var(--tele-blue)); color:#0A1128; font-size:30px; padding:24px 48px; border:4px solid rgba(255,255,255,0.9); }
   .tpl-2 .watermark-logo{ position:absolute; right:60px; bottom:60px; width:380px; opacity:0.07; filter:brightness(2); pointer-events:none; }
 
   /* ---- Template 3: Trust (Ice Blue Verified Card) ---- */
@@ -135,7 +135,7 @@
   .tpl-3 .wordmark{ left:50%; top:80px; transform:translateX(-50%); color:var(--tele-navy); }
   .tpl-3 .eyebrow{ position:absolute; top:400px; left:50%; transform:translateX(-50%); background:#E0F2FE; color:#0284C7; border:1px solid #BAE6FD; }
   .tpl-3 .headline{ position:absolute; top:460px; left:50%; transform:translateX(-50%); max-width:840px; text-align:center; color:var(--ink); }
-  .tpl-3 .cta-pill{ position:absolute; left:50%; bottom:140px; transform:translateX(-50%); background:var(--tele-navy); color:#FFFFFF; border:2px solid var(--tele-blue); }
+  .tpl-3 .cta-pill{ position:absolute; left:50%; bottom:140px; transform:translateX(-50%); background:var(--tele-navy); color:#FFFFFF; border:4px solid var(--tele-blue); }
 
   /* ---- Template 4: Urgency (Electric Gradient Banner) ---- */
   .tpl-4{ background:linear-gradient(135deg, #0052D4 0%, #007BFF 50%, #00C6FF 100%); color:#FFFFFF; height:100%; width:100%; position:relative; }
@@ -143,7 +143,7 @@
   .tpl-4 .wordmark .logo-img{ filter:brightness(0) invert(1) drop-shadow(0 4px 12px rgba(0,0,0,0.2)); }
   .tpl-4 .tpl-4-headwrap{ position:absolute; top:280px; left:92px; max-width:880px; }
   .tpl-4 .headline{ font-size:72px; color:#FFFFFF; text-shadow:0 4px 16px rgba(0,0,0,0.2); }
-  .tpl-4 .cta-pill{ position:absolute; left:92px; bottom:120px; background:#FFFFFF; color:#0052D4; font-size:28px; box-shadow:0 12px 32px rgba(0,0,0,0.25); }
+  .tpl-4 .cta-pill{ position:absolute; left:92px; bottom:120px; background:#FFFFFF; color:#0052D4; font-size:28px; border:4px solid #FFFFFF; }
 
   /* ---- Template 5: Identity (Sleek Dark Glassmorphism) ---- */
   .tpl-5{ background:var(--tele-dark); color:#FFFFFF; height:100%; width:100%; position:relative; display:flex; align-items:center; justify-content:center;}
@@ -152,22 +152,22 @@
     width:900px; height:800px; margin-top:60px;
     background:rgba(255,255,255,0.04); backdrop-filter:blur(30px); -webkit-backdrop-filter:blur(30px);
     border:1px solid rgba(255,255,255,0.12); border-radius:24px; padding:80px 64px; position:relative;
-    box-shadow:0 30px 80px rgba(0,0,0,0.5); display:flex; flex-direction:column; justify-content:space-between;
+    display:flex; flex-direction:column; justify-content:space-between;
   }
   .tpl-5 .headline{ font-size:64px; color:#FFFFFF; }
-  .tpl-5 .cta-pill{ align-self:flex-start; background:var(--tele-cyan); color:var(--tele-navy); }
+  .tpl-5 .cta-pill{ align-self:flex-start; background:var(--tele-cyan); color:var(--tele-navy); border:4px solid #FFFFFF; }
   .tpl-5 .glass-logo{ position:absolute; right:60px; top:60px; width:120px; opacity:0.15; }
 
   /* ---- Template 6: Ticket (Telegram Receipt Card) ---- */
   .tpl-6{ background:#0D1527; height:100%; width:100%; position:relative; display:flex; align-items:center; justify-content:center; }
   .tpl-6 .ticket-card{
     width:780px; background:#FFFFFF; border-radius:20px; padding:70px 64px 86px; position:relative;
-    box-shadow:0 24px 60px rgba(0,0,0,0.4); text-align:center;
+    text-align:center;
   }
   .tpl-6 .wordmark{ position:static; justify-content:center; margin-bottom:30px; color:var(--tele-navy); }
   .tpl-6 .eyebrow{ background:rgba(0,136,255,0.1); color:var(--tele-blue); margin-bottom:24px; }
   .tpl-6 .headline{ font-size:56px; text-align:center; color:var(--ink); }
-  .tpl-6 .cta-pill{ background:var(--tele-blue); color:#FFFFFF; margin-top:40px; }
+  .tpl-6 .cta-pill{ background:var(--tele-blue); color:#FFFFFF; margin-top:40px; border:4px solid #FFFFFF; }
 
   .hidden{display:none !important;}
 
